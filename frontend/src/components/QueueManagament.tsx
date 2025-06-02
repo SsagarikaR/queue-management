@@ -4,13 +4,19 @@ import { AxiosError } from "axios";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Logs, Play, RefreshCcw, Trash } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Logs,
+  Play,
+  RefreshCcw,
+  Trash,
+} from "lucide-react";
 
 export interface Job {
   id: number;
@@ -28,6 +34,9 @@ function QueueManagement() {
   const [err, setErr] = useState<string | undefined>();
   const [currentSelectLog, setCurrentSelectLog] = useState<string>();
   const [currentSelect, setCurrentSelect] = useState<number>();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 2;
+  const [totalPages, setTotalPages] = useState<number>(0);
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -48,8 +57,15 @@ function QueueManagement() {
   }, []);
   const getData = async () => {
     try {
-      const data = await fetchJobs(searchKey, searchData);
-      setJobs(data.data.result);
+      const data = await fetchJobs(
+        searchKey,
+        searchData,
+        currentPage,
+        pageSize
+      );
+      console.log(data);
+      setJobs(data.data.result.jobs);
+      setTotalPages(data.data.result.totalPages);
     } catch (err) {
       if (err instanceof AxiosError) {
         setErr(err.response?.data.message);
@@ -58,10 +74,21 @@ function QueueManagement() {
   };
   useEffect(() => {
     getData();
-  }, [searchKey, searchData]);
+  }, [searchKey, searchData, pageSize, currentPage]);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
-    <div className="w-screen h-screen p-6 flex flex-col gap-6 bg-gray-100">
+    <div className="w-screen h-screen p-6 flex flex-col gap-6 bg-blue-100">
       <div className="flex gap-4 items-center ">
         <input
           type="text"
@@ -164,7 +191,7 @@ function QueueManagement() {
                     </button>
                   )}
                   <button
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 "
                     onClick={async () => {
                       await setCurrentSelectLog(job.logs);
                       await setCurrentSelect(job.id);
@@ -177,13 +204,31 @@ function QueueManagement() {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-gray-500">
+              <TableCell colSpan={6} className="text-center ">
                 No data found
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-4  p-4">
+          <button onClick={handlePrevPage} disabled={currentPage === 1}>
+            <ChevronLeft size={16} />
+          </button>
+
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
 
       {err && (
         <div className="text-red-500 text-center">
@@ -192,13 +237,13 @@ function QueueManagement() {
       )}
 
       {currentSelect && currentSelect && (
-        <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
+        <div className="bg-white p-6 border  w-1/2">
           <h3 className="text-lg font-semibold mb-4">
-            Logs for Job #{currentSelect}
+            Logs of job {currentSelect}
           </h3>
-          <p className="text-gray-700">{currentSelectLog}</p>
+          <p>{currentSelectLog}</p>
           <button
-            className="mt-4 px-4 py-2 bg-black text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-blue-800 text-white rounded-sm"
             onClick={() => setCurrentSelect(undefined)}
           >
             Close

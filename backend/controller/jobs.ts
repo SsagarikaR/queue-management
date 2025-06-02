@@ -41,9 +41,13 @@ export const fetch = async (
   next: NextFunction
 ) => {
   try {
-    const { searchKey, searchData } = req.query;
-
-    const job = await getJob(searchKey as string, searchData as string);
+    const { searchKey, searchData, page = 1, limit = 10 } = req.query;
+    const job = await getJob(
+      searchKey as string,
+      searchData as string,
+      Number(page),
+      Number(limit)
+    );
 
     res.status(200).json({ message: "job fetched succesfully", result: job });
   } catch (err) {

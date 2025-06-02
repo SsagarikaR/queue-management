@@ -69,19 +69,42 @@ export const removeJobs = async (id: number) => {
   }
 };
 
-export const fetchJobs = async (searchKey?: string, searchData?: string) => {
+export const fetchJobs = async (
+  searchKey?: string,
+  searchData?: string,
+  page: number = 1,
+  pageSize: number = 10
+) => {
   try {
+    const offset = (page - 1) * pageSize;
     let query = `SELECT * FROM jobs `;
+    let countQuery = `SELECT COUNT(*) as total FROM jobs `;
     let replacements: any = {};
     if (searchKey?.trim() && searchData) {
       query += `WHERE ${searchKey}= :searchData`;
       replacements["searchData"] = searchData;
     }
+    query += `ORDER BY createdAt DESC `;
+    query += `LIMIT :limit OFFSET :offset`;
+    replacements["limit"] = pageSize;
+    replacements["offset"] = offset;
 
-    return await sequelize.query(query, {
+    const jobs = await sequelize.query(query, {
       replacements,
       type: QueryTypes.SELECT,
     });
+    const countResults = await sequelize.query(countQuery, {
+      replacements: searchKey?.trim() && searchData ? { searchData } : {},
+      type: QueryTypes.SELECT,
+    });
+    const totalCount = (countResults[0] as any).total;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    return {
+      jobs,
+      totalCount,
+      totalPages,
+    };
   } catch (err) {
     if (err instanceof Error) {
       throw new CustomErrror(err.message, 400);

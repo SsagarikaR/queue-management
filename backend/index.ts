@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import "./config/db";
 import webRoutes from "./routes";
-import { errorHandler } from "./moddleware/errorHandler";
+import { errorHandler } from "./middleware/errorHandler";
 import cors from "cors";
 import { startWebSocketServer } from "./websocket/app";
 

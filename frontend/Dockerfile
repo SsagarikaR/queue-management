@@ -1,9 +1,11 @@
 FROM node:18-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package.*.json ./
+COPY package*.json ./
 RUN npm install -legacy-peer-deeps
+
+EXPOSE 5173
 
 COPY . .
 CMD ["npm","run","dev"]

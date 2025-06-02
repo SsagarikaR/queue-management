@@ -1,17 +1,21 @@
 import axios from "axios";
 
-export const fetchJobs = async (searchKey: string, searchData: string) => {
-  let param;
-  if (searchKey && searchData.trim()) {
-    param = `?searchKey=${searchKey}&searchData=${searchData}`;
+export const fetchJobs = async (
+  searchKey = "",
+  searchData = "",
+  page = 1,
+  limit = 10
+) => {
+  let params = `?page=${page}&limit=${limit}`;
+
+  if (searchKey.trim() && searchData.trim()) {
+    params += `&searchKey=${encodeURIComponent(
+      searchKey
+    )}&searchData=${encodeURIComponent(searchData)}`;
   }
-  if (param) {
-    const jobs = await axios.get(`http://localhost:4000/jobs${param}`);
-    return jobs;
-  } else {
-    const jobs = await axios.get(`http://localhost:4000/jobs`);
-    return jobs;
-  }
+
+  const response = await axios.get(`http://localhost:4000/jobs${params}`);
+  return response;
 };
 
 export const updateJobs = async (

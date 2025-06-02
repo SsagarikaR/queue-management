@@ -39,8 +39,13 @@ export const updateJob = async (
   return job;
 };
 
-export const getJob = async (searchKey?: string, searchData?: string) => {
-  const job = fetchJobs(searchKey, searchData);
+export const getJob = async (
+  searchKey?: string,
+  searchData?: string,
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  const job = fetchJobs(searchKey, searchData, page, pageSize);
   return job;
 };
 
