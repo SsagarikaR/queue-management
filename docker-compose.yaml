@@ -1,0 +1,42 @@
+services:
+  container_name: queue_bckend
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  volumes:
+     - .:/app
+     - ./app/node_modules:/app/node_modules
+  environment:
+    - DB_NAME: 'queue_monitor'
+    - DB_USER: 'sagarika'
+    - DB_PASSWORD: 'Sagarika@%71'
+  depends_on:
+    mysql-db:
+      context: service-healthy
+  restart: unless-stopped
+  network:
+    my_network
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    volumes: 
+      - mysql-data:/usr/lib/mysql
+    enviornment:
+      - MYSQL_ROOT_PASSWORD: 'Sagarika@%71'
+      - MYSQL_PASSWORD: 'Sagarika@%71'
+      - MYSQL_USER: 'sagarika'
+      - MYSQL_HOST: 'localhost'
+    port:
+       '3307:3306'
+    restart: unless-stopped
+    network:
+      my_network
+
+volumes:
+  mysql-data
+
+
+    
+
+    
