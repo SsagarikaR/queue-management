@@ -18,29 +18,15 @@ import {
   Trash,
 } from "lucide-react";
 import { fetchLogs } from "../service/logs";
-
-export interface Job {
-  id: number;
-  jobType: string;
-  status: string;
-  progress: number;
-  createdAt: string;
-}
-
-export interface Logs {
-  id: number;
-  description: string;
-  createdAt: string;
-}
+import type { Job, Log } from "../types/type";
+import { QUEUE_MANAGEMENT } from "../utils/constants";
 
 function QueueManagement() {
   const [jobs, setJobs] = useState<Job[] | undefined>();
   const [searchKey, setSearchKey] = useState<string>("jobType");
   const [searchData, setSearchData] = useState<string>("");
   const [err, setErr] = useState<string | undefined>();
-  const [currentSelectLog, setCurrentSelectLog] = useState<
-    Logs[] | undefined
-  >();
+  const [currentSelectLog, setCurrentSelectLog] = useState<Log[] | undefined>();
   const [currentSelectQueue, setCurrentSelectQueue] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 2;
@@ -128,21 +114,31 @@ function QueueManagement() {
           onChange={(e) => setSearchKey(e.target.value)}
           defaultValue="jobType"
         >
-          <option value="jobType">Job Type</option>
-          <option value="status">Status</option>
-          <option value="pending">Date</option>
+          <option value="jobType">
+            {QUEUE_MANAGEMENT.SEARCH_KEY.JOB_TYPE}
+          </option>
+          <option value="status">{QUEUE_MANAGEMENT.SEARCH_KEY.STATUS}</option>
+          <option value="pending">{QUEUE_MANAGEMENT.SEARCH_KEY.DATE}</option>
         </select>
       </div>
 
       <Table className="bg-white shadow-md rounded-lg">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16 text-center">ID</TableHead>
-            <TableHead>Job Type</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Progress</TableHead>
-            <TableHead className="text-right">Started</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="w-16 text-center">
+              {QUEUE_MANAGEMENT.TABLE_HEADERS.ID}
+            </TableHead>
+            <TableHead>{QUEUE_MANAGEMENT.TABLE_HEADERS.JOB_TYPE}</TableHead>
+            <TableHead>{QUEUE_MANAGEMENT.TABLE_HEADERS.STATUS}</TableHead>
+            <TableHead className="text-right">
+              {QUEUE_MANAGEMENT.TABLE_HEADERS.PROGRESS}
+            </TableHead>
+            <TableHead className="text-right">
+              {QUEUE_MANAGEMENT.TABLE_HEADERS.STARTED}
+            </TableHead>
+            <TableHead className="text-right">
+              {QUEUE_MANAGEMENT.TABLE_HEADERS.ACTIONS}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -257,16 +253,19 @@ function QueueManagement() {
 
       {err && (
         <div className="text-red-500 text-center">
-          <p>Error: {err}</p>
+          <p>
+            {QUEUE_MANAGEMENT.LABEL_DESCRIPTION.ERROR} {err}
+          </p>
         </div>
       )}
 
       {currentSelectQueue && currentSelectLog && (
         <div className="bg-white p-6 border  w-1/2">
           <h3 className="text-lg font-semibold mb-4">
-            Logs of job {currentSelectQueue}
+            {QUEUE_MANAGEMENT.LABEL_DESCRIPTION.LOGS_OF_JOB}{" "}
+            {currentSelectQueue}
           </h3>
-          {currentSelectLog.length > 0 &&
+          {currentSelectLog.length > 0 ? (
             currentSelectLog.map((log) => {
               return (
                 <div>
@@ -274,13 +273,16 @@ function QueueManagement() {
                   <span>{log.description}</span>
                 </div>
               );
-            })}
+            })
+          ) : (
+            <div>{QUEUE_MANAGEMENT.LABEL_DESCRIPTION.NO_LOGS_FOUND}</div>
+          )}
           <p></p>
           <button
             className="mt-4 px-4 py-2 bg-blue-800 text-white rounded-sm"
             onClick={() => setCurrentSelectLog(undefined)}
           >
-            Close
+            {QUEUE_MANAGEMENT.BUTTONS.CLOSE}
           </button>
         </div>
       )}
