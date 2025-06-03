@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.ts"
+    "dev": "nodemon index.ts",
+    "start": "node dist/index.js",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "lint:fix": "eslint 'src/**/*.{js,ts}' --fix",
+    "format": "prettier --write 'src/**/*.{js,ts,json}'"
   },
   "keywords": [],
   "author": "",
@@ -15,12 +19,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
     "mysql2": "^3.14.1",
     "nodemon": "^3.1.10",
+    "prettier": "^3.5.3",
     "sequelize": "^6.37.7",
     "ws": "^8.18.2"
   },
   "devDependencies": {
+    "@mindfiredigital/eslint-plugin-hub": "^2.0.0",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/ws": "^8.18.1"

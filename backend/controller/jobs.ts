@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { createJob, getJob, removeJob, updateJob } from "../service/jobs";
+import { JOB } from "../utils/constants";
 
 export const create = async (
   req: Request,
@@ -9,7 +10,7 @@ export const create = async (
   try {
     const { jobType, status, progress, logs } = req.body;
     const job = await createJob(jobType, status, progress, logs);
-    res.status(200).json({ message: "job created succesfully", result: job });
+    res.status(200).json({ message: JOB.CREATED_SUCCESSFULLY, result: job });
   } catch (err) {
     next(err);
   }
@@ -29,7 +30,7 @@ export const update = async (
       progress,
       logs,
     });
-    res.status(200).json({ message: "job updated succesfully", result: job });
+    res.status(200).json({ message: JOB.UPDATED_SUCCESSFULLY, result: job });
   } catch (err) {
     next(err);
   }
@@ -49,7 +50,7 @@ export const fetch = async (
       Number(limit)
     );
 
-    res.status(200).json({ message: "job fetched succesfully", result: job });
+    res.status(200).json({ message: JOB.FETCHED_SUCCESSFULLY, result: job });
   } catch (err) {
     next(err);
   }
@@ -65,7 +66,7 @@ export const remove = async (
 
     const remove = await removeJob(Number(id));
 
-    res.status(200).json({ message: "job deleted succesfully" });
+    res.status(200).json({ message: JOB.DELETED_SUCCESSFULLY });
   } catch (err) {
     next(err);
   }

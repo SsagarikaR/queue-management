@@ -20,8 +20,4 @@ export const jobs = sequelize.define("jobs", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  logs: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
 });

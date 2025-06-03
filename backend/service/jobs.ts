@@ -6,6 +6,7 @@ import {
   updateJobs,
 } from "../repository/jobs";
 import { Job } from "../types/type";
+import { JOB } from "../utils/constants";
 import { CustomErrror } from "../utils/customError";
 
 export const createJob = async (
@@ -14,12 +15,12 @@ export const createJob = async (
   progress: number,
   logs: string
 ): Promise<Job> => {
+  if (!jobType || !status || !progress || !logs) {
+    throw new CustomErrror(JOB.MISSING_FIELD, 400);
+  }
   const jobExist = await fetchJobByType(jobType);
   if (jobExist) {
-    throw new CustomErrror(
-      "this job already exist please check the stautus and retry if its pending",
-      400
-    );
+    throw new CustomErrror(JOB.ALREADY_EXIST, 400);
   }
   const job = await createJobs(jobType, status, progress, logs);
 
@@ -45,6 +46,10 @@ export const getJob = async (
   page: number = 1,
   pageSize: number = 10
 ) => {
+  if ((searchKey && !searchData) || (!searchKey && searchData)) {
+    throw new CustomErrror(JOB.MISSING_SEARCH_QUERY, 400);
+  }
+
   const job = fetchJobs(searchKey, searchData, page, pageSize);
   return job;
 };
