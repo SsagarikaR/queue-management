@@ -43,8 +43,8 @@ npm install
 Create a `.env` file in the frontend directory:
 
 ```
-VITE_WS_URL=ws://localhost:8080
-VITE_API_URL=http://localhost:3000/api
+VITE_WS_URL=ws://localhost:4000
+VITE_API_URL=http://localhost:4000/api
 ```
 
 #### Start Frontend Development Server
@@ -81,7 +81,7 @@ DB_HOST=localhost
 npm run dev
 ```
 
-The backend API will be available at http://localhost:3000.
+The backend API will be available at http://localhost:4000.
 
 ## Docker Deployment
 
