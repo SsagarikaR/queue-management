@@ -14,7 +14,9 @@ export const fetchJobs = async (
     )}&searchData=${encodeURIComponent(searchData)}`;
   }
 
-  const response = await axios.get(`http://localhost:4000/jobs${params}`);
+  const response = await axios.get(
+    `${import.meta.env.VITE_API_URL}jobs${params}`
+  );
   return response;
 };
 
@@ -22,11 +24,11 @@ export const updateJobs = async (
   id: number,
   data: { jobType?: string; status?: string; progress?: number; logs?: string }
 ) => {
-  const jobs = await axios.put(`http://localhost:4000/jobs/${id}`, data);
+  const jobs = await axios.put(`${import.meta.env.VITE_API_URL}${id}`, data);
   return jobs;
 };
 
 export const deleteJobs = async (id: number) => {
-  const jobs = await axios.delete(`http://localhost:4000/jobs/${id}`);
+  const jobs = await axios.delete(`${import.meta.env.VITE_API_URL}{id}`);
   return jobs;
 };

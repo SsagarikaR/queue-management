@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteJobs, fetchJobs, updateJobs } from "../service/jobs";
 import { AxiosError } from "axios";
 import {
@@ -17,13 +17,19 @@ import {
   RefreshCcw,
   Trash,
 } from "lucide-react";
+import { fetchLogs } from "../service/logs";
 
 export interface Job {
   id: number;
   jobType: string;
   status: string;
   progress: number;
-  logs: string;
+  createdAt: string;
+}
+
+export interface Logs {
+  id: number;
+  description: string;
   createdAt: string;
 }
 
@@ -32,15 +38,17 @@ function QueueManagement() {
   const [searchKey, setSearchKey] = useState<string>("jobType");
   const [searchData, setSearchData] = useState<string>("");
   const [err, setErr] = useState<string | undefined>();
-  const [currentSelectLog, setCurrentSelectLog] = useState<string>();
-  const [currentSelect, setCurrentSelect] = useState<number>();
+  const [currentSelectLog, setCurrentSelectLog] = useState<
+    Logs[] | undefined
+  >();
+  const [currentSelectQueue, setCurrentSelectQueue] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 2;
   const [totalPages, setTotalPages] = useState<number>(0);
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const wsUrl = "ws://localhost:4000/api/ws";
+    const wsUrl = import.meta.env.VITE_WS_URL;
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
@@ -55,6 +63,24 @@ function QueueManagement() {
       ws.close();
     };
   }, []);
+
+  useEffect(() => {
+    if (currentSelectQueue) {
+      fetchLog();
+    }
+  }, [currentSelectQueue]);
+
+  const fetchLog = useCallback(async () => {
+    try {
+      const response = await fetchLogs(currentSelectQueue);
+      console.log(response);
+      setCurrentSelectLog(response.data.result);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        setErr(err.response?.data.message);
+      }
+    }
+  }, [currentSelectQueue]);
   const getData = async () => {
     try {
       const data = await fetchJobs(
@@ -193,8 +219,7 @@ function QueueManagement() {
                   <button
                     className="text-gray-500 "
                     onClick={async () => {
-                      await setCurrentSelectLog(job.logs);
-                      await setCurrentSelect(job.id);
+                      setCurrentSelectQueue(job.id);
                     }}
                   >
                     <Logs />
@@ -236,15 +261,24 @@ function QueueManagement() {
         </div>
       )}
 
-      {currentSelect && currentSelect && (
+      {currentSelectQueue && currentSelectLog && (
         <div className="bg-white p-6 border  w-1/2">
           <h3 className="text-lg font-semibold mb-4">
-            Logs of job {currentSelect}
+            Logs of job {currentSelectQueue}
           </h3>
-          <p>{currentSelectLog}</p>
+          {currentSelectLog.length > 0 &&
+            currentSelectLog.map((log) => {
+              return (
+                <div>
+                  <span>{log.createdAt}</span>
+                  <span>{log.description}</span>
+                </div>
+              );
+            })}
+          <p></p>
           <button
             className="mt-4 px-4 py-2 bg-blue-800 text-white rounded-sm"
-            onClick={() => setCurrentSelect(undefined)}
+            onClick={() => setCurrentSelectLog(undefined)}
           >
             Close
           </button>
